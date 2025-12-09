@@ -1,0 +1,292 @@
+executor: slurm
+
+default-resources:
+  cpus_per_task: 1
+  mem_mb: 1500
+  runtime: 10
+  slurm_extra: "'--no-requeue'"
+
+set-resources:
+  # ---- Assembly / graph ----
+  coassemble_reads:
+    cpus_per_task: "min(96, max(24, len(input.r1) * 6))"
+    mem_mb: "min(2000000, max(64000, len(input.r1) * 64000 + 100000) )"
+    runtime: "min(4880, max(2880, ( (len(input.r1) + 70) * 75) ) )"
+    slurm_extra: "'--no-requeue'"
+    
+  megahit_contig2fastg:
+    cpus_per_task: 1
+    mem_mb: 32000
+    runtime: 30
+    slurm_extra: "'--no-requeue'"
+    
+  agtools_fastg2gfa:
+    cpus_per_task: 1
+    mem_mb: 32000
+    runtime: 10
+    slurm_extra: "'--no-requeue'"
+
+  # ---- Gene calls (unchanged) ----
+  predict_genes_pprodigal:
+    cpus_per_task: 40
+    mem_mb: 60000
+    runtime: 90
+    slurm_extra: "'--no-requeue'"
+
+  # ---- Mapping / coverage ----
+  build_bowtie2_coassembly_index:
+    cpus_per_task: 24
+    mem_mb: 96000
+    runtime: 120
+    slurm_extra: "'--no-requeue'"
+    
+  map_reads_coassembly:
+    cpus_per_task: 21
+    mem_mb: 72000
+    runtime: 360
+    slurm_extra: "'--no-requeue'"
+    
+  coverm_contig_coverage:
+    cpus_per_task: 24
+    mem_mb: 64000
+    runtime: 180
+    slurm_extra: "'--no-requeue'"
+
+  # ---- Binning backends ----
+  jgi_depth:
+    cpus_per_task: 20
+    mem_mb: 18000
+    runtime: 135
+    slurm_extra: "'--no-requeue'"
+    
+  metabat2_binning:
+    cpus_per_task: 24
+    mem_mb: 256000
+    runtime: 600
+    slurm_extra: "'--no-requeue'"
+    
+  rename_metabat2_bins:
+    cpus_per_task: 1
+    mem_mb: 2000
+    runtime: 10
+    slurm_extra: "'--no-requeue'"
+
+  genomeface_markers:
+    cpus_per_task: 4
+    mem_mb: 96000
+    runtime: 600
+    slurm_extra: "'--no-requeue'"
+    
+  run_genomeface:
+    cpus_per_task: 2
+    gres: "'shard:2'"
+    mem_mb: 96000
+    runtime: 420
+    slurm_extra: "'--no-requeue'"
+    
+  rename_genomeface_bins:
+    cpus_per_task: 1
+    mem_mb: 2000
+    runtime: 10
+    slurm_extra: "'--no-requeue'"
+
+  semibin2_single_easy_bin:
+    cpus_per_task: 12
+    gres: "'shard:2'"
+    mem_mb: 500000
+    runtime: 900
+    slurm_extra: "'--no-requeue'"
+    
+  rename_semibin2_bins:
+    cpus_per_task: 1
+    mem_mb: 4000
+    runtime: 10
+    slurm_extra: "'--no-requeue'"
+
+  mmseqs2_taxonomy:
+    cpus_per_task: 22
+    gres: "'shard:1'"
+    mem_mb: 600000
+    runtime: 450
+    slurm_extra: "'--no-requeue'"
+    
+  run_taxvamb:
+    cpus_per_task: 3
+    gres: "'shard:3'"
+    mem_mb: 64000
+    runtime: 4320
+    slurm_extra: "'--no-requeue'"
+    
+  rename_vamb_bins:
+    cpus_per_task: 1
+    mem_mb: 2000
+    runtime: 10
+    slurm_extra: "'--no-requeue'"
+
+  # ---- GraphBin2 ----
+  graphbin2_prep:
+    cpus_per_task: 1
+    mem_mb: 16000
+    runtime: 10
+    slurm_extra: "'--no-requeue'"
+    
+  graphbin2_run:
+    cpus_per_task: 4
+    mem_mb: 64000
+    runtime: 60
+    slurm_extra: "'--no-requeue'"
+
+  # ---- Binette + post ----
+  binette_run:
+    cpus_per_task: 16
+    mem_mb: 192000
+    runtime: 500
+    slurm_extra: "'--no-requeue'"
+    
+  binette_finalize_bins:
+    cpus_per_task: 1
+    mem_mb: 8000
+    runtime: 10
+    slurm_extra: "'--no-requeue'"
+
+  # ---- dRep on Binette ----
+  drep_binette:
+    cpus_per_task: 32
+    mem_mb: 128000
+    runtime: 60
+    slurm_extra: "'--no-requeue'"
+
+  # ---- (Optional) CheckM2 after dRep ----
+  checkm2_predict:
+    cpus_per_task: 24
+    mem_mb: 128000
+    runtime: 60
+    slurm_extra: "'--no-requeue'"
+
+  # ---- Anvi'o path ----
+  fix_assembly_headers_copy:
+    cpus_per_task: 1
+    mem_mb: 6000
+    runtime: 20
+    slurm_extra: "'--no-requeue'"
+    
+  build_external_gene_calls:
+    cpus_per_task: 1
+    mem_mb: 16000
+    runtime: 60
+    slurm_extra: "'--no-requeue'"
+    
+  anvio_gen_contigs_db:
+    cpus_per_task: 12
+    mem_mb: 96000
+    runtime: 240
+    slurm_extra: "'--no-requeue'"
+    
+  anvio_profile_single:
+    cpus_per_task: 6
+    mem_mb: 256000
+    runtime: 900
+    slurm_extra: "'--no-requeue'"
+    
+  anvio_profile_merge:
+    cpus_per_task: 8
+    mem_mb: 128000
+    runtime: 120
+    slurm_extra: "'--no-requeue'"
+    
+  anvio_copy_rename_bins:
+    cpus_per_task: 1
+    mem_mb: 2000
+    runtime: 10
+    slurm_extra: "'--no-requeue'"
+    
+  anvio_bins_to_import:
+    cpus_per_task: 1
+    mem_mb: 2000
+    runtime: 15
+    slurm_extra: "'--no-requeue'"
+    
+  anvio_import_collection:
+    cpus_per_task: 4
+    mem_mb: 96000
+    runtime: 15
+    slurm_extra: "'--no-requeue'"
+    
+  anvio_run_hmms:
+    cpus_per_task: 24
+    mem_mb: 128000
+    runtime: 600
+    slurm_extra: "'--no-requeue'"
+    
+  anvio_run_scg_taxonomy:
+    cpus_per_task: 16
+    mem_mb: 32000
+    runtime: 120
+    slurm_extra: "'--no-requeue'"
+
+  # ---- Legacy / optional blocks retained if present in your repo ----
+  singlem_profile:
+    cpus_per_task: 18
+    mem_mb: 144000
+    runtime: 135
+    slurm_extra: "'--no-requeue'"
+    
+  summarise_singlem_results:
+    cpus_per_task: 1
+    mem_mb: 8000
+    runtime: 15
+    slurm_extra: "'--no-requeue'"
+    
+  cluster_genes_cdhit:
+    cpus_per_task: 36
+    mem_mb: 24000
+    runtime: 270
+    slurm_extra: "'--no-requeue'"
+    
+  extract_clustered_nucleotide_genes:
+    cpus_per_task: 1
+    mem_mb: 6000
+    runtime: 15
+    slurm_extra: "'--no-requeue'"
+    
+  build_bowtie2_c95_index:
+    cpus_per_task: 24
+    mem_mb: 96000
+    runtime: 45
+    slurm_extra: "'--no-requeue'"
+    
+  map_reads_c95:
+    cpus_per_task: 20
+    mem_mb: 72000
+    runtime: 270
+    slurm_extra: "'--no-requeue'"
+    
+  annotate_eggnog:
+    cpus_per_task: 96
+    mem_mb: 96000
+    runtime: 450
+    slurm_extra: "'--no-requeue'"
+    
+  annotate_dbcan:
+    cpus_per_task: 12
+    mem_mb: 300000
+    runtime: 1620
+    slurm_extra: "'--no-requeue'"
+    
+  annotate_merops:
+    cpus_per_task: 32
+    mem_mb: 64000
+    runtime: 750
+    slurm_extra: "'--no-requeue'"
+    
+  split_contigs_for_markers:
+    cpus_per_task: 1
+    mem_mb: 16000
+    runtime: 10
+    slurm_extra: "'--no-requeue'"
+    
+  genomeface_markers_chunk:
+    cpus_per_task: 4
+    mem_mb: 8000
+    runtime: 60
+    slurm_extra: "'--no-requeue'"

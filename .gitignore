@@ -1,0 +1,15 @@
+.snakemake/
+logs/
+tmp/
+fastq/
+assembly/
+mapping/
+genes/
+binning/
+anvio/
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
