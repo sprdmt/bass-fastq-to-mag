@@ -19,7 +19,7 @@ jobs:
           environment-name: ci
           create-args: >-
             python=3.12
-            "snakemake>=8.20"
+            snakemake>=8.20
             snakefmt
             pytest
             pandas
