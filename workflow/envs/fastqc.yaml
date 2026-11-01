@@ -1,0 +1,13 @@
+# fastqc: per-read-file QC reports.
+# Pin: 0.12.1 (LiSC FastQC/0.12.1 module era). 0.13.0 (2026-10) moved the launcher to python3
+# and is documented as not drop-in; no fix relevant here.
+# Image: quay.io/biocontainers/fastqc:0.12.1--hdfd78af_0
+# openjdk pinned to the LTS 17 (unpinned solves pick 25; the LiSC module used Java 11).
+# Channel priority: strict (conda config --set channel_priority strict).
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  - fastqc=0.12.1
+  - openjdk=17

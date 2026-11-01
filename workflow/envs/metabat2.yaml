@@ -1,0 +1,12 @@
+# metabat2: jgi_summarize_bam_contig_depths + metabat2.
+# Pin: 2.18 (LiSC default MetaBAT/2.18; 2.17 and 2.18 share the GCC-13.3.0 toolchain).
+# The 2.18_23_gc869c52 Bioconda version is a development snapshot and is avoided.
+# Image: quay.io/biocontainers/metabat2:2.18--h38e344b_2
+# '==' is required: '=2.18' fuzzy-matches the 2.18_23_gc869c52 snapshot.
+# Channel priority: strict (conda config --set channel_priority strict).
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  - metabat2==2.18

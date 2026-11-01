@@ -1,0 +1,10 @@
+# Workstation/single-server profile. Set `gpu: {request: none}` in config/config.yaml, or
+# `gpu: {request: gpus}` together with `resources: [gpu=1]` below to run one GPU job at a time.
+cores: all
+software-deployment-method: apptainer    # or: conda
+apptainer-args: "--nv --env PYTHONPATH= --env PYTHONNOUSERSITE=1"
+# resources: [gpu=1]
+retries: 1
+rerun-incomplete: true
+keep-going: true
+printshellcmds: true

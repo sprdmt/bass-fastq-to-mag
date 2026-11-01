@@ -1,0 +1,88 @@
+# bass-fastq-to-mag: metagenome-assembled genomes from paired-end reads
+#
+# reads -> cutadapt/FastQC -> MEGAHIT co-assembly -> assembly graph -> Bowtie2
+#       -> MetaBAT2 | GenomeFace | SemiBin2 | TaxVAMB -> GraphBin2 (per binner)
+#       -> Binette -> [anvi'o manual refinement] -> dRep -> GTDB-Tk, MIMAG rRNA/tRNA
+#       -> final MAG table -> ENA submission (optional)
+#
+# Targets: all (default), qc, assembly, bins, anvio, mags, ena_prepare, ena_validate,
+# ena_submit (ENA test server), download_databases. See README.md.
+
+from snakemake.utils import min_version
+
+min_version("8.20.0")
+
+# Clusters with Lmod or RHEL's which2.sh export bash functions (BASH_FUNC_which%% etc.), and
+# Apptainer passes them into the containers. The exported `which` calls GNU-only options, so it
+# fails in BusyBox-based images; barrnap then reports nhmmer as missing. Every shell command
+# therefore starts without it (the first part is Snakemake's default bash prefix).
+shell.prefix("set -euo pipefail; unset -f which 2>/dev/null || true; ")
+
+
+configfile: "config/config.yaml"
+
+
+include: "rules/common.smk"
+include: "rules/qc.smk"
+include: "rules/assembly.smk"
+include: "rules/genes.smk"
+include: "rules/mapping.smk"
+include: "rules/binning.smk"
+include: "rules/taxvamb.smk"
+include: "rules/graphbin2.smk"
+include: "rules/refinement.smk"
+include: "rules/finalize.smk"
+include: "rules/anvio.smk"
+include: "rules/ena.smk"
+include: "rules/databases.smk"
+
+
+localrules:
+    all,
+    qc,
+    assembly,
+    bins,
+    anvio,
+    mags,
+    ena_prepare,
+    ena_submit,
+
+
+rule all:
+    input:
+        default_targets(),
+
+
+rule qc:
+    input:
+        qc_targets(),
+
+
+rule assembly:
+    input:
+        assembly_targets(),
+
+
+rule bins:
+    input:
+        bins_targets(),
+
+
+rule anvio:
+    input:
+        anvio_targets(),
+
+
+rule mags:
+    input:
+        mags_targets(),
+
+
+rule ena_prepare:
+    input:
+        ena_prepare_targets(),
+
+
+rule ena_submit:
+    input:
+        f"{OUT}/ena/submit/test_submission.done",

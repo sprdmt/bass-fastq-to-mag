@@ -1,0 +1,11 @@
+# seqkit: split contigs into chunks for markersgf.
+# Pin: 2.12.0 = newest SeqKit at the time of the user's Jan-2026 runs; fixes the split2
+# --by-part-prefix regression of 2.11.0. 2.13/2.14 add options and speed only.
+# Image: quay.io/biocontainers/seqkit:2.12.0--he881be0_1
+# Channel priority: strict (conda config --set channel_priority strict).
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  - seqkit=2.12.0

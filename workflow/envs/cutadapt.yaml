@@ -1,0 +1,11 @@
+# cutadapt: adapter and quality trimming of raw reads.
+# Pin: LiSC module cutadapt/5.2 used in bass3/scripts/1_cutadapt.sh (latest release).
+# Image: quay.io/biocontainers/cutadapt:5.2--py312hfabe715_2 (py312 build -> python pinned).
+# Channel priority: strict (conda config --set channel_priority strict).
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  - python=3.12
+  - cutadapt=5.2

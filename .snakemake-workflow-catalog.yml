@@ -1,0 +1,13 @@
+usage:
+  mandatory-flags:
+    desc: >
+      Run with a profile, e.g. --workflow-profile profiles/slurm (SLURM) or
+      profiles/local (one machine). Software comes from pinned containers
+      (--software-deployment-method apptainer) or conda environments
+      (--software-deployment-method conda).
+    flags: "--software-deployment-method apptainer"
+  software-stack-deployment:
+    conda: true
+    singularity: true
+    singularity+conda: false
+  report: false

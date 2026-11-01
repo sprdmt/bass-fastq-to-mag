@@ -1,0 +1,14 @@
+# vamb (CPU fallback): TaxVamb without --cuda.
+# Pin: 5.0.4 = LiSC central env vamb-5.0.4 (5.0.4 fixes two critical TaxVamb bugs).
+# Image: quay.io/biocontainers/vamb:5.0.4--pyhdfd78af_0 (CPU PyTorch). taxconverter is NOT included (see taxconverter.yaml).
+# numpy pinned to the user's validated vamb-5.0.4 env (numpy 2.3).
+# Channel priority: strict (conda config --set channel_priority strict).
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  - python=3.12
+  - vamb=5.0.4
+  - pytorch=2.8.*=cpu*
+  - numpy=2.3

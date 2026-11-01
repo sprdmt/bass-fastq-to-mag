@@ -1,0 +1,29 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+description: One row per paired-end sequencing unit (run or lane pair)
+type: object
+properties:
+  sample:
+    type: string
+    pattern: "^(?!.*__)[A-Za-z0-9][A-Za-z0-9_.-]*$"
+    description: Unique name (letters, digits, '.', '_', '-'; no double underscore)
+  fq1:
+    type: string
+    pattern: ".+\\.(fastq|fq)(\\.gz)?$"
+    description: Path to read 1
+  fq2:
+    type: string
+    pattern: ".+\\.(fastq|fq)(\\.gz)?$"
+    description: Path to read 2
+  assembly_group:
+    type: string
+    pattern: "^(?!.*__)[A-Za-z0-9][A-Za-z0-9_.-]*$"
+    description: Samples with the same group are co-assembled and co-binned (empty = project name)
+  run_accession:
+    type: string
+    pattern: "^([EDS]RR[0-9]+)?$"
+    description: ENA/SRA run accession of these reads (needed only for ENA submission)
+  sample_accession:
+    type: string
+    pattern: "^((SAM[EDN][A-Z]?[0-9]+)|([EDS]RS[0-9]+))?$"
+    description: BioSample/ENA sample accession (needed only for ENA submission)
+required: [sample, fq1, fq2]

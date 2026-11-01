@@ -1,0 +1,7 @@
+# ENA tables in the default run, lineages from the GTDB workbooks with a taxdump
+ena:
+  enabled: true
+  lineage_method: consensus
+  gtdb_ncbi_workbooks: [db/gtdb_vs_ncbi_bacteria.xlsx, db/gtdb_vs_ncbi_archaea.xlsx]
+  taxdump: db/taxdump.tar.gz
+  gtdb_metadata: {bac120: db/bac120_metadata.tsv.gz, ar53: db/ar53_metadata.tsv.gz}

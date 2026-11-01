@@ -1,0 +1,18 @@
+# semibin2 (CPU fallback): SemiBin2 single_easy_bin with --engine cpu.
+# Pin: 2.4.1. User ran 2.2.0 (LiSC SemiBin-2.2.0). Upgrade for documented fixes: 2.2.1 igraph
+# compatibility (#208); 2.3.0 Prodigal errors were silently ignored and cached markers.hmmout was
+# reused on reruns into an existing output dir; 2.4.0 further bug fixes. 2.5/2.6 add features and
+# raise minimums (Python 3.11, pandas 3), not taken.
+# Image: quay.io/biocontainers/semibin:2.4.1--pyhdfd78af_0 (CPU PyTorch).
+# pandas/numpy pinned to the user's validated SemiBin-2.2.0 env (pandas 2.3, numpy 2.3); SemiBin adopted pandas 3 only in 2.6.0.
+# Channel priority: strict (conda config --set channel_priority strict).
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  - python=3.12
+  - semibin=2.4.1
+  - pytorch=2.8.*=cpu*
+  - pandas=2.3
+  - numpy=2.3

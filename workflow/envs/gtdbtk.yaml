@@ -1,0 +1,17 @@
+# gtdbtk: GTDB-Tk classify_wf.
+# Pin: 2.6.1. User ran 2.5.2 (LiSC GTDBTk-2.5.2, GTDBTK_DATA_PATH=/lisc/opt/mirror/GTDBTk/r226).
+# 2.6.0 removed the 100-genome limit in dense genera (#671; wrong species calls) and fixed the
+# pplacer alpha20 crash; 2.6.1 fixes check_install. 2.6.x accepts reference data r220/r226
+# (COMPATIBLE_REF_DATA_VERSIONS); 2.7.0+ requires the R232 package, so it is not taken.
+# Image: quay.io/biocontainers/gtdbtk:2.6.1--pyh1f0d9b5_2
+# Build _2 caps python<3.14; skani pinned to 0.3.1 as GTDB-Tk 2.6.0 intends (recipe allows >=0.3.0; 0.4.0 is 2026-10).
+# python pinned to 3.13 = the python in the image (checked on LiSC).
+# Channel priority: strict (conda config --set channel_priority strict).
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  - python=3.13
+  - gtdbtk=2.6.1=pyh1f0d9b5_2
+  - skani=0.3.1

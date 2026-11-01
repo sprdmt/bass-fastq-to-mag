@@ -1,0 +1,13 @@
+# mmseqs2: MMseqs2 taxonomy of contigs for TaxVAMB (UniRef90), optional --gpu.
+# Pin: 18.8cc5c (LiSC MMseqs2/18-8cc5c module; improved GPU support, GPU-compatible databases).
+# The Bioconda recipe builds with -DENABLE_CUDA=1 on Linux since 16.747c6 (statically linked CUDA runtime).
+# GPU use verified on LiSC 2026-10-31 (Tesla T4): `mmseqs search --gpu 1` against a makepaddedseqdb target
+# gave 20/20 correct top hits on a synthetic protein set. GPU mode needs padded DBs (makepaddedseqdb / createdb --gpu).
+# Image: quay.io/biocontainers/mmseqs2:18.8cc5c--hd6d6fdc_0
+# Channel priority: strict (conda config --set channel_priority strict).
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  - mmseqs2=18.8cc5c

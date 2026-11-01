@@ -1,0 +1,20 @@
+# ENA submission tools (ena_submit.py, ena_coassembly.py). Versions are the ones
+# installed in the user's validated LiSC env 'ena_tools' (genome_uploader 2.5.1
+# sources are byte-identical to PyPI 2.5.1). Newer releases exist
+# (genome-uploader 3.1.0, ena-webin-cli 10.0.0, mgnify-pipelines-toolkit 1.5.5);
+# the table builder output passes the 3.1.0 validator too. ENA refuses outdated
+# webin-cli clients, so bump ena-webin-cli if webin-cli reports that its
+# version is no longer supported.
+name: ena
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  - python=3.11
+  - genome-uploader=2.5.1
+  - mgnify-pipelines-toolkit=1.4.8
+  - ena-webin-cli=9.0.1
+  - pandas>=2.0,<3
+  - pyyaml
+  - requests

@@ -1,0 +1,11 @@
+# quast: assembly statistics (metaquast.py --max-ref-number 0).
+# Pin: 5.3.0 (latest; LiSC QUAST/5.3.0 module).
+# Image: quay.io/biocontainers/quast:5.3.0--py313pl5321h5ca1c30_2 (py313 build).
+# Channel priority: strict (conda config --set channel_priority strict).
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  - python=3.13
+  - quast=5.3.0

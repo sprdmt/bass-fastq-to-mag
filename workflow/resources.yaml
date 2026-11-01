@@ -1,0 +1,177 @@
+# Default resource model (see docs/resources.md).
+#
+# For every job and each of threads / mem_mb (MB) / runtime (minutes):
+#   value = base + per_gb*GB + per_sample*N + per_gb_sample*GB*N + per_file*F
+#   GB = size of the inputs named in `size_of` (all inputs if omitted), N = samples
+#   in the assembly group, F = number of input files (directories are walked).
+# The value is raised to `min`, multiplied by retry_factor^(attempt-1) for mem_mb and
+# runtime, and clamped to the entry's `max` and to `limits`.
+#
+# Override anything under `resources:` in config/config.yaml; keys you do not set keep
+# these defaults. Calibration notes: starting values derive from settings that ran
+# ecotip2 (2.83 M contigs) and medea-II (14 read pairs, 43 GB FASTQ, 1.19 GB assembly).
+
+limits:              # what the largest node of your cluster offers
+  max_threads: 96
+  max_mem_mb: 1000000
+  max_runtime: 10080  # 7 days
+
+retry_factor: 1.5    # memory/runtime multiplier per retry (use with --retries)
+
+partitions: []       # optional: [{name: small, max_mem_mb: 380000, max_runtime: 4320}, ...]
+gpu_partitions: []   # optional, same format, used by GPU jobs
+
+rules:
+  # ---- read QC (per sample) ----
+  cutadapt:
+    threads: {base: 4}
+    mem_mb: {base: 4000}
+    runtime: {base: 10, per_gb: 3}
+  fastqc:
+    threads: {base: 2}
+    mem_mb: {base: 3000}
+    runtime: {base: 10, per_gb: 4}
+  multiqc:
+    threads: {base: 1}
+    mem_mb: {base: 8000}
+    runtime: {base: 30}
+
+  # ---- assembly and graph (per group) ----
+  megahit:
+    threads: {base: 16, per_gb: 1.5, size_of: [r1, r2]}
+    mem_mb: {base: 64000, per_gb: 6000, size_of: [r1, r2]}
+    runtime: {base: 240, per_gb: 30, size_of: [r1, r2]}
+  contig2fastg:
+    threads: {base: 1}
+    mem_mb: {base: 4000, per_gb: 4000}
+    runtime: {base: 20, per_gb: 15}
+  fastg2gfa:
+    threads: {base: 1}
+    mem_mb: {base: 4000, per_gb: 2000}
+    runtime: {base: 10, per_gb: 10}
+  quast:
+    threads: {base: 8}
+    mem_mb: {base: 8000, per_gb: 8000}
+    runtime: {base: 30, per_gb: 30}
+  pprodigal:
+    threads: {base: 32}
+    mem_mb: {base: 8000, per_gb: 8000}
+    runtime: {base: 30, per_gb: 100}
+
+  # ---- mapping and coverage ----
+  bowtie2_index:
+    threads: {base: 24}
+    mem_mb: {base: 16000, per_gb: 12000}
+    runtime: {base: 60, per_gb: 60}
+  bowtie2_map:                       # per sample; memory follows the index, time the reads
+    threads: {base: 16}
+    mem_mb: {base: 16000, per_gb: 6000, size_of: [index]}
+    runtime: {base: 30, per_gb: 12, size_of: [r1, r2, index]}
+  coverm_contig:
+    threads: {base: 16}
+    mem_mb: {base: 16000, per_gb: 500, size_of: [bams]}
+    runtime: {base: 30, per_gb: 3, size_of: [bams]}
+  jgi_depth:
+    threads: {base: 16}
+    mem_mb: {base: 16000, per_gb: 200, size_of: [bams]}
+    runtime: {base: 30, per_gb: 3, size_of: [bams]}
+
+  # ---- binners ----
+  metabat2:
+    threads: {base: 24}
+    mem_mb: {base: 16000, per_gb: 30000, size_of: [contigs]}
+    runtime: {base: 60, per_gb: 120, size_of: [contigs]}
+  genomeface_split:
+    threads: {base: 1}
+    mem_mb: {base: 4000}
+    runtime: {base: 10, per_gb: 5}
+  genomeface_markers:                # per contig chunk
+    threads: {base: 4}
+    mem_mb: {base: 8000}
+    runtime: {base: 60, per_gb: 240}
+  genomeface:
+    threads: {base: 4}
+    mem_mb: {base: 32000, per_gb: 10000, size_of: [contigs]}
+    runtime: {base: 60, per_gb: 60, size_of: [contigs]}
+  semibin2:
+    threads: {base: 12}
+    mem_mb: {base: 32000, per_gb: 40000, size_of: [contigs]}
+    runtime: {base: 120, per_gb: 60, per_sample: 5, size_of: [contigs]}
+  mmseqs2_taxonomy:                  # memory is dominated by the reference database
+    threads: {base: 24}
+    mem_mb: {base: 200000, per_gb: 20000, size_of: [contigs]}
+    runtime: {base: 120, per_gb: 120, size_of: [contigs]}
+  taxconverter:
+    threads: {base: 1}
+    mem_mb: {base: 8000, per_gb: 2000}
+    runtime: {base: 30}
+  vamb:
+    threads: {base: 4}
+    mem_mb: {base: 16000, per_gb: 8000, size_of: [contigs]}
+    runtime: {base: 120, per_gb: 400, size_of: [contigs]}
+
+  # ---- refinement, dereplication, quality, taxonomy ----
+  graphbin2:
+    threads: {base: 1}
+    mem_mb: {base: 4000, per_gb: 1000, size_of: [contigs, graph]}
+    runtime: {base: 20, per_gb: 5, size_of: [contigs, graph]}
+  binette:
+    threads: {base: 16}
+    mem_mb: {base: 32000, per_gb: 20000, size_of: [contigs]}
+    runtime: {base: 60, per_gb: 120, per_file: 10, size_of: [contigs, tables]}  # F = 1 + number of bin tables
+  checkm2:
+    threads: {base: 16}
+    mem_mb: {base: 32000, per_file: 50}
+    runtime: {base: 30, per_file: 1}
+  drep:
+    threads: {base: 16}
+    mem_mb: {base: 16000, per_file: 200}
+    runtime: {base: 30, per_file: 1}
+  gtdbtk:
+    threads: {base: 32}
+    mem_mb: {base: 120000}
+    runtime: {base: 120, per_file: 2}
+  mag_rna:
+    threads: {base: 8}
+    mem_mb: {base: 8000}
+    runtime: {base: 10, per_file: 1}
+
+  # ---- anvi'o workspace ----
+  anvio_contigs_db:
+    threads: {base: 12}
+    mem_mb: {base: 16000, per_gb: 12000, size_of: [fasta]}
+    runtime: {base: 60, per_gb: 120, size_of: [fasta]}
+  anvio_hmms:
+    threads: {base: 24}
+    mem_mb: {base: 16000, per_gb: 10000}
+    runtime: {base: 60, per_gb: 60}
+  anvio_scg_taxonomy:
+    threads: {base: 16}
+    mem_mb: {base: 32000}
+    runtime: {base: 120}
+  anvio_profile:                     # per sample
+    threads: {base: 6}
+    mem_mb: {base: 32000, per_gb: 8000, size_of: [bam]}
+    runtime: {base: 60, per_gb: 300, size_of: [bam]}
+  anvio_merge:
+    threads: {base: 8}
+    mem_mb: {base: 32000, per_sample: 2000}
+    runtime: {base: 60, per_sample: 15}
+  anvio_collection:
+    threads: {base: 4}
+    mem_mb: {base: 16000, per_gb: 4000}
+    runtime: {base: 60, per_gb: 30}
+
+  # ---- small helper jobs and ENA ----
+  small:
+    threads: {base: 1}
+    mem_mb: {base: 4000, per_gb: 2000}
+    runtime: {base: 20, per_gb: 10}
+  ena:
+    threads: {base: 4}
+    mem_mb: {base: 8000}
+    runtime: {base: 120, per_file: 2}
+  database:
+    threads: {base: 8}
+    mem_mb: {base: 16000}
+    runtime: {base: 1440}

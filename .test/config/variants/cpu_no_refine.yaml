@@ -1,0 +1,4 @@
+gpu: {enabled: false}
+binning: {binners: [metabat2, semibin2, vamb]}   # GenomeFace needs a GPU
+graphbin2: {enabled: false}
+qc: {enabled: false, fastqc: false}

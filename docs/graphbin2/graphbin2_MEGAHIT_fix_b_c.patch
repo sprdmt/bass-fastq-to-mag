@@ -1,0 +1,53 @@
+--- a/src/graphbin2/graphbin2_MEGAHIT.py
++++ b/src/graphbin2/graphbin2_MEGAHIT.py
+@@ -335,4 +335,4 @@
+                         abs(
+-                            coverages[contigs_map[node]]
+-                            - coverages[contigs_map[active_node]]
++                            coverages[node]
++                            - coverages[active_node]
+                         ),
+@@ -410,3 +410,3 @@
+                             and BFS_labelled_bin_counts[max_index] > 1
+-                            and contig_lengths[contigs_map[my_node]] < 10000
++                            and contig_lengths[my_node] < 10000
+                         ):
+@@ -657,6 +657,6 @@
+                 bin_cov_sum[i] += (
+-                    coverages[contigs_map[bins[i][j]]]
+-                    * contig_lengths[contigs_map[bins[i][j]]]
++                    coverages[bins[i][j]]
++                    * contig_lengths[bins[i][j]]
+                 )
+-                bin_contig_len_total[i] += contig_lengths[contigs_map[bins[i][j]]]
++                bin_contig_len_total[i] += contig_lengths[bins[i][j]]
+ 
+@@ -734,3 +734,3 @@
+         logger.info(
+-            contig_names[contig]
++            graph_to_contig_map[contigs_map[contig]]
+             + " belongs to bins "
+@@ -841,6 +841,6 @@
+         bin_coverages[contig_bin] = bin_coverages[contig_bin] - (
+-            coverages[contigs_map[contig]] * contig_lengths[contigs_map[contig]]
++            coverages[contig] * contig_lengths[contig]
+         )
+         bin_contig_lengths[contig_bin] = (
+-            bin_contig_lengths[contig_bin] - contig_lengths[contigs_map[contig]]
++            bin_contig_lengths[contig_bin] - contig_lengths[contig]
+         )
+@@ -862,3 +862,3 @@
+                     neighbour_bins[n].append(neighbour)
+-                    neighbour_bin_coverages[n].append(coverages[contigs_map[neighbour]])
++                    neighbour_bin_coverages[n].append(coverages[neighbour])
+                     break
+@@ -891,3 +891,3 @@
+ 
+-                cov_diff = abs(comb_cov_total - coverages[contigs_map[contig]])
++                cov_diff = abs(comb_cov_total - coverages[contig])
+ 
+@@ -900,3 +900,3 @@
+                 and len(min_diff_combination) > 1
+-                and contig_lengths[contigs_map[contig]] > 1000
++                and contig_lengths[contig] > 1000
+             ):

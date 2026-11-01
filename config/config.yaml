@@ -1,0 +1,190 @@
+# Configuration of bass-fastq-to-mag (all keys and defaults: workflow/schemas/config.schema.yaml)
+
+# Name used for the default assembly group and the final MAG names (<project>_MAG_<n>).
+project: my_project
+
+# Tab-separated sample sheet: sample, fq1, fq2 [, assembly_group, run_accession, sample_accession]
+samples: config/samples.tsv
+
+# All results go below this directory (logs/ and benchmarks/ sit next to it).
+outdir: results
+
+# ---------------------------------------------------------------------------
+# Read QC with cutadapt (defaults reproduce the original BASS processing)
+# ---------------------------------------------------------------------------
+qc:
+  enabled: true                 # false: use the FASTQ files as given (already trimmed)
+  adapter_r1: AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC
+  adapter_r2: AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT
+  adapter_mode: anywhere        # anywhere (-b/-B) or three_prime (-a/-A)
+  quality_cutoff: "20,20"
+  nextseq_trim: 20              # two-colour chemistry poly-G trimming; null to disable
+  cut_r1: 9                     # bases removed from the 5' end (library-specific)
+  cut_r2: 9
+  minimum_length: 50
+  overlap: 5
+  pair_filter: any
+  extra: ""
+  fastqc: true
+
+# ---------------------------------------------------------------------------
+# Co-assembly (one per assembly group) and assembly graph
+# ---------------------------------------------------------------------------
+assembly:
+  k_min: 25
+  k_max: 125
+  k_step: 10
+  k_list: ""                    # e.g. "21,29,39,59,79,99,119,141" overrides k_min/k_max/k_step
+  min_contig_len: 1000
+  min_count: 2
+  memory_fraction: 0.9          # share of the job memory MEGAHIT may use
+  workdir: ""                   # MEGAHIT intermediates; "$TMPDIR" uses node-local disk
+  extra: ""
+  quast: true
+
+graph:
+  require_edges: true           # stop if the assembly graph has no edges
+
+genes:
+  procedure: meta               # Prodigal mode for metagenomes
+  chunksize: 20000
+
+mapping:
+  bowtie2_extra: "--no-unal"
+
+# ---------------------------------------------------------------------------
+# Binning, graph refinement, consensus and dereplication
+# ---------------------------------------------------------------------------
+binning:
+  binners: [metabat2, genomeface, semibin2, vamb]
+  metabat2: {min_contig: 1500, min_bin_size: 100000, seed: 1, extra: ""}
+  genomeface: {marker_chunks: 24, min_contig: 1500, min_purity: 85, extra: ""}
+  semibin2: {min_len: 2500, extra: ""}
+  vamb:
+    min_contig: 1000
+    min_fasta: 200000
+    mmseqs_gpu: true            # needs a GPU-padded MMseqs2 database
+    extra: ""
+
+graphbin2:
+  enabled: true                 # refine every binner's bins with the assembly graph
+  binette_input: both           # both: original and GraphBin2 bins go to Binette, which keeps the
+                                # better version of each genome; refined: GraphBin2 bins only
+  depth: 5
+  threshold: 1.5
+
+binette:
+  min_completeness: 70
+
+drep:
+  ani: 0.995                    # strain-level; 0.95 for species-level representatives
+  min_completeness: 50
+  max_contamination: 10
+
+mags:
+  source: auto                  # auto = Binette bins; anvio = kept bins + collection 'Refine' (see anvio)
+  min_completeness: 50          # final MAG thresholds (50/10 = MIMAG medium quality)
+  max_contamination: 10
+  rna:                          # MIMAG rRNA/tRNA criteria (quality class, ENA rRNA_presence)
+    exclude_partial_rrna: false # true: ignore barrnap hits flagged as partial
+    trna_mode: standard20       # standard20: >= min_trna of the 20 standard amino acids; legacy: old counting
+    min_trna: 18
+  coverage_method: sum_mean     # genome_coverage: sum_mean (mean over contigs of the summed sample depths)
+                                # or length_weighted
+
+gtdbtk:
+  enabled: true
+  extra: "--skip_ani_screen"
+
+anvio:
+  enabled: false                # build the anvi'o workspace for manual refinement
+  min_contig_len: 1000
+  scg_taxonomy: true
+  review: contaminated          # contaminated: only bins worth cleaning go into 'Refine'; all: every bin
+  refine_min_completeness: 90   # refinement removes contigs, so less complete bins are not offered
+  refine_contamination_above: 5 # offer bins above this contamination (5 = MIMAG high-quality limit)
+
+# ---------------------------------------------------------------------------
+# Reference databases (see docs/databases.md; `snakemake download_databases` can fetch them)
+# ---------------------------------------------------------------------------
+databases:
+  checkm2: ""                   # .../CheckM2_database/uniref100.KO.1.dmnd
+  gtdbtk: ""                    # GTDB-Tk reference package directory
+  mmseqs2_taxonomy: ""          # MMseqs2 taxonomy database (e.g. GTDB or UniRef90 with taxonomy)
+  anvio_scg: ""                 # empty = data shipped with the anvi'o image
+
+# ---------------------------------------------------------------------------
+# GPUs (SemiBin2, TaxVAMB/MMseqs2, GenomeFace)
+# ---------------------------------------------------------------------------
+gpu:
+  enabled: true                 # false = CPU engines and CPU images; GenomeFace needs a GPU,
+                                # so then also remove it from binning.binners
+  request: gres                 # gres | gpus | none
+  gres: "gpu:1"                 # SLURM --gres for one GPU (also on LiSC, which has no shard GRES)
+  count: 1
+
+# ---------------------------------------------------------------------------
+# Resources: size-aware estimates, capped by what your cluster offers
+# (defaults and coefficients: workflow/resources.yaml; guide: docs/resources.md)
+# ---------------------------------------------------------------------------
+resources:
+  limits:
+    max_threads: 96
+    max_mem_mb: 1000000
+    max_runtime: 10080
+  retry_factor: 1.5
+  # partitions:                 # optional: choose the smallest partition that fits
+  #   - {name: small, max_mem_mb: 380000}
+  #   - {name: large, max_mem_mb: 1000000}
+  # rules:                      # per-step overrides, e.g.
+  #   megahit: {mem_mb: {base: 128000, per_gb: 8000}}
+
+# ---------------------------------------------------------------------------
+# Container images: override entries of workflow/containers.yaml if needed,
+# e.g. with local .sif files on clusters without internet access.
+# ---------------------------------------------------------------------------
+containers: {}
+
+# ---------------------------------------------------------------------------
+# ENA submission (docs/ena_submission.md). Nothing is submitted unless you run the
+# ena_submit target, and only to the ENA test server unless live: true.
+# ---------------------------------------------------------------------------
+ena:
+  enabled: false                # add the ENA tables (target ena_prepare) to the default run
+  study: ""                     # PRJEB... that holds the raw reads
+  centre_name: ""               # e.g. "University of Vienna"
+  genome_type: bins             # bins: binned metagenomes (ERC000050); mags: MAG tier (ERC000047),
+                                # which expects species-level dereplication (dRep here: 99.5 % ANI)
+  private: true                 # raw reads and samples are still private
+  min_completeness: 50          # MAG tier only
+  max_contamination: 10
+  metagenome: "seawater metagenome"   # must be in genome_uploader's list of metagenomes
+  metagenome_taxid: 1561972           # taxon of the co-assembly samples
+  broad_environment: "marine biome [ENVO:00000447]"
+  local_environment: ""         # e.g. "sea surface microlayer [ENVO:...]"
+  environmental_medium: ""
+  assembly_software: ""         # empty: MEGAHIT_v<version of the workflow's image>
+  binning_software: ""          # empty: the binners of this run with their versions
+  binning_parameters: "default"
+  stats_generation_software: "" # empty: CheckM2_v<version>
+  groups: {}                    # per assembly group overrides, e.g. {g2: {local_environment: "..."}}
+  lineage_method: majority_vote # majority_vote | mapping_table | consensus (docs/ena_submission.md)
+  lineage_cross_check: false    # majority_vote: also report disagreements with the mapping table
+  lineage_max_rank: genus
+  gtdb_metadata:                # GTDB metadata of the GTDB-Tk release (R226), for majority_vote
+    bac120: ""                  # bac120_metadata_r226.tsv.gz (`snakemake download_databases` fetches both)
+    ar53: ""                    # ar53_metadata_r226.tsv.gz
+  gtdb_ncbi_workbooks: []       # gtdb_vs_ncbi_r226_{bacteria,archaea}.xlsx (mapping_table, consensus, cross-check)
+  taxdump: ""                   # NCBI taxdump (mapping_table, consensus, cross-check)
+  coassembly:                   # primary assemblies of groups with >= 2 samples
+    submit_primary: true
+    sample_alias_prefix: ""
+    checklist: ERC000011
+    attributes:                 # values shared by all source samples
+      collection date: ""
+      geographic location (country and/or sea): ""
+    program: ""                 # empty: "MEGAHIT v<version>"
+    platform: ILLUMINA
+  webin:
+    java_heap_max_gb: 4
+    delay_s: 2

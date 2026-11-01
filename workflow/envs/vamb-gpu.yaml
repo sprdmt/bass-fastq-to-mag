@@ -1,0 +1,17 @@
+# vamb-gpu: TaxVamb with --cuda. Mirrors LiSC central env vamb-5.0.4 (pytorch 2.8.0 cuda129, python 3.12).
+# The custom image adds a second env 'taxconverter' (taxconverter.yaml) exposed on PATH, because
+# taxconverter 1.1.0 pins python<3.12, pandas==2.0.0, numpy==1.26.4 and cannot share this env.
+# Solve with CONDA_OVERRIDE_CUDA=12.9 on machines without a GPU.
+# Image (custom): ghcr.io/sprdmt/bass-fastq-to-mag-vamb-gpu:5.0.4
+# numpy pinned to the user's validated vamb-5.0.4 env (numpy 2.3).
+# Channel priority: strict (conda config --set channel_priority strict).
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  - python=3.12
+  - vamb=5.0.4
+  - pytorch=2.8.0=cuda*
+  - cuda-version=12.9
+  - numpy=2.3

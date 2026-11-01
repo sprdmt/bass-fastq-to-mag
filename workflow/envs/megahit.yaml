@@ -1,0 +1,12 @@
+# megahit: co-assembly; the package also ships megahit_toolkit (contig2fastg).
+# Pin: 1.2.9 (only release; LiSC MEGAHIT/1.2.9 module, same build as the user's anvio-9 env).
+# Image: quay.io/biocontainers/megahit:1.2.9--haf24da9_8
+# python pinned to 3.13 = the python in the image (checked on LiSC).
+# Channel priority: strict (conda config --set channel_priority strict).
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  - python=3.13
+  - megahit=1.2.9

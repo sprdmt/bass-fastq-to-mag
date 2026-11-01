@@ -1,0 +1,17 @@
+# drep: dereplication (dRep dereplicate -sa 0.995).
+# Pin: 3.6.2 (LiSC dRep/3.6.2 module used by the user). 4.x changes defaults (skani primary and
+# secondary clustering, single linkage) and results; its skani coverage-unit fix does not affect the
+# 3.6.2 default (Mash + fastANI). NOTE: pass --genomeInfo (CheckM2 values as genome,completeness,
+# contamination CSV) or --ignoreGenomeQuality, otherwise dRep 3.x runs CheckM1, whose data is not set up.
+# Image: quay.io/biocontainers/drep:3.6.2--pyhdfd78af_0
+# python pinned to 3.11 = the python in the image (checked on LiSC).
+# skani pinned to 0.2 as in the image (0.2.2); only used with --S_algorithm skani.
+# Channel priority: strict (conda config --set channel_priority strict).
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  - python=3.11
+  - drep=3.6.2
+  - skani=0.2

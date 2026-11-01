@@ -1,0 +1,13 @@
+# pprodigal: parallel Prodigal gene calling (meta mode).
+# Pin: pprodigal 1.0.1 (only release) + prodigal 2.6.3 = user's env 'pprodigal'.
+# Image: quay.io/biocontainers/pprodigal:1.0.1--pyhdfd78af_0 (contains prodigal).
+# python pinned to 3.10 = the python in the image (checked on LiSC).
+# Channel priority: strict (conda config --set channel_priority strict).
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  - python=3.10
+  - pprodigal=1.0.1
+  - prodigal=2.6.3

@@ -1,0 +1,11 @@
+# barrnap: rRNA detection for the MIMAG check.
+# Pin: 0.9 (LiSC barrnap/0.9 module). 1.10.x (2026-04) is a rewrite in which feature names changed;
+# the MIMAG parser expects 0.9 '5S/16S/23S ribosomal RNA' products.
+# Image: quay.io/biocontainers/barrnap:0.9--hdfd78af_4
+# Channel priority: strict (conda config --set channel_priority strict).
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  - barrnap=0.9

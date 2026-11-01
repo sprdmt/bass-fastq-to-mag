@@ -1,0 +1,6 @@
+# This file may be used to create an environment using:
+# $ conda create --name <env> --file <this file>   (or: micromamba create -n <env> -f <this file>)
+# Generated 2026-10-31 by micromamba 2.x dry-run solve of workflow/envs/seqkit.yaml (linux-64, strict priority)
+# platform: linux-64
+@EXPLICIT
+https://conda.anaconda.org/bioconda/linux-64/seqkit-2.12.0-he881be0_1.conda#f4aaad7eb59f508aca96c808304e2172

@@ -1,0 +1,5 @@
+# taxconverter 1.1.0 (PyPI only; RasmussenLab). Installed with --no-deps --require-hashes into the
+# 'taxconverter' env of the vamb-gpu image; its pinned deps come from taxconverter.conda.linux-64.pin.txt.
+taxconverter==1.1.0 \
+    --hash=sha256:982648db89dab80fdfe385ce7f0e6d34bc16aa0774daa457b7bdaca437f6d087 \
+    --hash=sha256:6e8ff784d504b0045cb834107012d532d4257b494d849e7a3e6a5abafd4a9f3d

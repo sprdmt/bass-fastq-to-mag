@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this workflow, please cite it as below, together with the tools it runs (see README)."
+title: "bass-fastq-to-mag: a containerized Snakemake workflow for metagenome-assembled genomes"
+type: software
+authors:
+  - family-names: Spriahailo
+    given-names: Dmytro
+    affiliation: "University of Vienna"
+version: 1.0.0
+date-released: "2026-11-01"
+license: MIT
+repository-code: "https://github.com/sprdmt/bass-fastq-to-mag"
+keywords:
+  - metagenomics
+  - binning
+  - metagenome-assembled genomes
+  - snakemake
+  - assembly graph
