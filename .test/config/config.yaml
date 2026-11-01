@@ -1,0 +1,13 @@
+# Configuration for CI dry runs (empty FASTQ placeholders; nothing is executed)
+project: test
+samples: config/samples.tsv
+binning:
+  genomeface: {marker_chunks: 3}
+databases:
+  checkm2: db/checkm2.dmnd
+  gtdbtk: db/gtdbtk
+  mmseqs2_taxonomy: db/mmseqs2/db
+anvio:
+  enabled: true
+resources:
+  limits: {max_threads: 8, max_mem_mb: 64000, max_runtime: 1440}

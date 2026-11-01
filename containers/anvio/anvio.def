@@ -1,0 +1,34 @@
+# Apptainer equivalent of containers/anvio/Dockerfile (same base image, same pin file).
+# Build from the repository root, e.g. on LiSC:
+#   apptainer build --fakeroot bass-fastq-to-mag-anvio_9.sif containers/anvio/anvio.def
+Bootstrap: docker
+From: ghcr.io/mamba-org/micromamba:2.9.0
+
+%labels
+    org.opencontainers.image.title bass-fastq-to-mag-anvio
+    org.opencontainers.image.description anvi'o 9 (anvio-minimal 9 + HMMER, DIAMOND, Prodigal, SAMtools; SCG taxonomy databases set up at build time)
+    org.opencontainers.image.version 9
+    org.opencontainers.image.source https://github.com/sprdmt/bass-fastq-to-mag
+    org.opencontainers.image.base.name ghcr.io/mamba-org/micromamba:2.9.0
+
+%files
+    workflow/envs/anvio.yaml /opt/env/anvio.yaml
+    workflow/envs/anvio.linux-64.pin.txt /opt/env/anvio.linux-64.pin.txt
+
+%environment
+    export PATH=/opt/conda/bin:$PATH
+    export MAMBA_ROOT_PREFIX=/opt/conda
+    export PYTHONNOUSERSITE=1
+
+%post
+    set -e
+    export MAMBA_ROOT_PREFIX=/opt/conda
+    export PATH=/opt/conda/bin:$PATH
+    micromamba install -y -n base -f /opt/env/anvio.linux-64.pin.txt
+    anvi-setup-scg-taxonomy -T 4
+    micromamba clean --all --yes
+    chmod -R a+rX /opt/conda /opt/env
+
+%test
+    export PATH=/opt/conda/bin:$PATH
+    anvi-gen-contigs-database --version && anvi-run-scg-taxonomy --help > /dev/null && hmmsearch -h > /dev/null && diamond version

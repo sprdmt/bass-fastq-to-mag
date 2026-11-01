@@ -1,0 +1,14 @@
+# coverm: per-contig coverage table for GraphBin2 and genome coverage for ENA.
+# Pin: 0.7.0 = LiSC central env CoverM-0.7.0 used by the user. 0.8.0 (2026-07) adds mappers/features only.
+# Image: quay.io/biocontainers/coverm:0.7.0--hcb7b614_4 (same build as CoverM-0.7.0).
+# python pinned to 3.13 = the python in the image (checked on LiSC).
+# samtools pinned to 1.22 as in the image and the user's CoverM-0.7.0 env (1.22.1).
+# Channel priority: strict (conda config --set channel_priority strict).
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  - python=3.13
+  - coverm=0.7.0
+  - samtools=1.22

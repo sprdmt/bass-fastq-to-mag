@@ -1,0 +1,16 @@
+# checkm2: MAG completeness/contamination (DIAMOND DB uniref100.KO.1.dmnd, CheckM2 DB v3).
+# Pin: 1.1.0 (only 1.1 release; LiSC CheckM2/1.1.0 module). Build pinned to pyh7e72e81_1
+# (TensorFlow 2.17, Python 3.12), the build in the user's binette env and LiSC Binette-1.2.1;
+# build _0 is the legacy Python<3.9/TF<2.6 stack and _2 (2026-10) is unvalidated.
+# Image: quay.io/biocontainers/checkm2:1.1.0--pyh7e72e81_1
+# pandas<3 as in the image era (CheckM2 1.1.0 predates pandas 3).
+# No explicit python pin: build _1 declares python >3.12 and TF 2.17 has no py313 build, so python resolves to 3.12.x
+# (libmamba rejects 'python=3.12' together with 'python >3.12' as an unsupported request).
+# Channel priority: strict (conda config --set channel_priority strict).
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  - checkm2=1.1.0=pyh7e72e81_1
+  - pandas=2.2

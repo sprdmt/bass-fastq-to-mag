@@ -1,0 +1,155 @@
+--- upstream/graphbin2_MEGAHIT.py
++++ reference/graphbin2_MEGAHIT_reference.py
+@@ -1,0 +2,17 @@
++# =============================================================================
++# REFERENCE VARIANT FOR TESTING (bass-fastq-to-mag)
++# GraphBin2 1.3.3, src/graphbin2/graphbin2_MEGAHIT.py (PyPI sdist, identical to
++# GitHub master), with ONLY these changes:
++#   FIX(b) coverages[contigs_map[x]] -> coverages[x] and
++#          contig_lengths[contigs_map[x]] -> contig_lengths[x]
++#          (both dicts are keyed by graph node index; contigs_map maps node
++#          index -> 1-based NODE number, so upstream reads the next contig)
++#   FIX(c) contig_names[contig] (undefined) ->
++#          graph_to_contig_map[contigs_map[contig]] in the multi-bin log line
++#   standalone: BidirectionalMap vendored below (unchanged upstream class),
++#          cogent3 MinimalFastaParser with a minimal fallback, and a small
++#          argparse CLI at the end (graphbin2 cli.py prefix handling).
++# Algorithm and data structures are otherwise upstream's (lists, igraph).
++# GraphBin2: Copyright (c) 2022, Vijini Mallawaarachchi; BSD 3-Clause License
++# (see LICENSE of GraphBin2 / the header of workflow/scripts/graphbin2_fast.py).
++# =============================================================================
+@@ -16 +33,20 @@
+-from cogent3.parse.fasta import MinimalFastaParser
++try:
++    from cogent3.parse.fasta import MinimalFastaParser
++except ImportError:  # minimal equivalent for environments without cogent3
++
++    def MinimalFastaParser(path):
++        label, chunks = None, []
++        with open(path) as fh:
++            for line in fh:
++                line = line.strip()
++                if not line:
++                    continue
++                if line.startswith(">"):
++                    if label is not None:
++                        yield label, "".join(chunks)
++                    label, chunks = line[1:].strip(), []
++                else:
++                    chunks.append(line)
++        if label is not None:
++            yield label, "".join(chunks)
++
+@@ -20 +56,38 @@
+-from .bidirectionalmap.bidirectionalmap import BidirectionalMap
++# --- vendored from graphbin2/bidirectionalmap/bidirectionalmap.py (unchanged) ---
++# This code is used from the source found at
++# https://stackoverflow.com/questions/3318625/how-to-implement-an-efficient-bidirectional-hash-table
++# answered by user jme
++class BidirectionalError(Exception):
++    """Must set a unique value in a BijectiveMap."""
++
++    def __init__(self, value):
++        self.value = value
++        msg = 'The value "{}" is already in the mapping.'
++        super().__init__(msg.format(value))
++
++
++class BidirectionalMap(dict):
++    """Invertible map."""
++
++    def __init__(self, inverse=None):
++        if inverse is None:
++            inverse = self.__class__(inverse=self)
++        self.inverse = inverse
++
++    def __setitem__(self, key, value):
++        if value in self.inverse:
++            raise BidirectionalError(value)
++
++        self.inverse._set_item(value, key)
++        self._set_item(key, value)
++
++    def __delitem__(self, key):
++        self.inverse._del_item(self[key])
++        self._del_item(key)
++
++    def _del_item(self, key):
++        super().__delitem__(key)
++
++    def _set_item(self, key, value):
++        super().__setitem__(key, value)
++# --- end vendored ---
+@@ -336,2 +409,2 @@
+-                            coverages[contigs_map[node]]
+-                            - coverages[contigs_map[active_node]]
++                            coverages[node]
++                            - coverages[active_node]
+@@ -411 +484 @@
+-                            and contig_lengths[contigs_map[my_node]] < 10000
++                            and contig_lengths[my_node] < 10000
+@@ -658,2 +731,2 @@
+-                    coverages[contigs_map[bins[i][j]]]
+-                    * contig_lengths[contigs_map[bins[i][j]]]
++                    coverages[bins[i][j]]
++                    * contig_lengths[bins[i][j]]
+@@ -661 +734 @@
+-                bin_contig_len_total[i] += contig_lengths[contigs_map[bins[i][j]]]
++                bin_contig_len_total[i] += contig_lengths[bins[i][j]]
+@@ -735 +808 @@
+-            contig_names[contig]
++            graph_to_contig_map[contigs_map[contig]]
+@@ -842 +915 @@
+-            coverages[contigs_map[contig]] * contig_lengths[contigs_map[contig]]
++            coverages[contig] * contig_lengths[contig]
+@@ -845 +918 @@
+-            bin_contig_lengths[contig_bin] - contig_lengths[contigs_map[contig]]
++            bin_contig_lengths[contig_bin] - contig_lengths[contig]
+@@ -863 +936 @@
+-                    neighbour_bin_coverages[n].append(coverages[contigs_map[neighbour]])
++                    neighbour_bin_coverages[n].append(coverages[neighbour])
+@@ -892 +965 @@
+-                cov_diff = abs(comb_cov_total - coverages[contigs_map[contig]])
++                cov_diff = abs(comb_cov_total - coverages[contig])
+@@ -901 +974 @@
+-                and contig_lengths[contigs_map[contig]] > 1000
++                and contig_lengths[contig] > 1000
+@@ -912,0 +986,35 @@
++class _Args:
++    pass
++
++
++def cli(argv=None):
++    import argparse
++
++    ap = argparse.ArgumentParser(description="GraphBin2 1.3.3 MEGAHIT mode, reference with fixes (b),(c)")
++    ap.add_argument("--contigs", required=True)
++    ap.add_argument("--graph", required=True)
++    ap.add_argument("--binned", required=True)
++    ap.add_argument("--output", required=True)
++    ap.add_argument("--prefix", default=None)
++    ap.add_argument("--depth", type=int, default=5)
++    ap.add_argument("--threshold", type=float, default=1.5)
++    ap.add_argument("--delimiter", default=",")
++    ap.add_argument("--nthreads", type=int, default=8)
++    ap.add_argument("--paths", default=None)
++    a = ap.parse_args(argv)
++    args = _Args()
++    args.contigs, args.graph, args.paths = a.contigs, a.graph, a.paths
++    args.binned, args.output = a.binned, a.output
++    prefix = a.prefix
++    if prefix is not None:
++        if not prefix.endswith("_"):
++            prefix = prefix + "_"
++    else:
++        prefix = ""
++    args.prefix = prefix
++    args.depth, args.threshold = a.depth, a.threshold
++    args.delimiter = "\t" if a.delimiter in ("tab", "\\t") else a.delimiter
++    args.nthreads = a.nthreads
++    run(args)
++
++
+@@ -914 +1022 @@
+-    main()
++    cli()

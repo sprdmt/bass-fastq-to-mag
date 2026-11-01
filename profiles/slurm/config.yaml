@@ -1,0 +1,22 @@
+# Generic SLURM profile (Snakemake >= 8 with snakemake-executor-plugin-slurm).
+# Usage: snakemake --workflow-profile profiles/slurm
+# Per-job memory, runtime and threads come from the workflow's resource model
+# (workflow/resources.yaml, capped by `resources.limits` in config/config.yaml).
+executor: slurm
+jobs: 50
+software-deployment-method: apptainer
+# --nv exposes GPUs; add "--bind <dir>" for every path outside the working directory
+# (raw reads, databases), e.g. "--nv --bind /data,/databases". The --env settings keep a
+# PYTHONPATH from environment modules and ~/.local packages out of the containers.
+apptainer-args: "--nv --env PYTHONPATH= --env PYTHONNOUSERSITE=1"
+# apptainer-prefix: /shared/apptainer_images   # cache pulled images once for all projects
+retries: 2              # each retry multiplies memory/runtime by resources.retry_factor
+latency-wait: 120
+rerun-incomplete: true
+keep-going: true
+printshellcmds: true
+default-resources:
+  slurm_account: "REPLACE_WITH_ACCOUNT"
+  slurm_partition: "REPLACE_WITH_PARTITION"
+  runtime: 60
+  mem_mb: 4000

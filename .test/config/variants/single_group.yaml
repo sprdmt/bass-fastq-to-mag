@@ -1,0 +1,3 @@
+samples: config/samples_single.tsv
+anvio: {enabled: false}
+gtdbtk: {enabled: false}

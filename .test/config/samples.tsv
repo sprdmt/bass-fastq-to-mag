@@ -1,0 +1,4 @@
+sample	fq1	fq2	assembly_group	run_accession	sample_accession
+A1	data/A1_R1.fastq.gz	data/A1_R2.fastq.gz	groupA	ERR0000001	SAMEA0000001
+A2	data/A2_R1.fastq.gz	data/A2_R2.fastq.gz	groupA	ERR0000002	SAMEA0000002
+B1	data/B1_R1.fastq.gz	data/B1_R2.fastq.gz	groupB	ERR0000003	SAMEA0000003

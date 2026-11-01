@@ -1,0 +1,18 @@
+# semibin2-gpu: SemiBin2 with CUDA PyTorch (--engine gpu).
+# SemiBin 2.4.1 (see semibin2.yaml) + conda-forge PyTorch 2.8.0 CUDA 12.9 build, the same
+# PyTorch/CUDA stack as the user's validated vamb-5.0.4 GPU env (user's SemiBin-2.2.0 used 2.5.1/cu118).
+# Solve with CONDA_OVERRIDE_CUDA=12.9 on machines without a GPU.
+# Image (custom): ghcr.io/sprdmt/bass-fastq-to-mag-semibin2-gpu:2.4.1
+# pandas/numpy pinned to the user's validated SemiBin-2.2.0 env (pandas 2.3, numpy 2.3); SemiBin adopted pandas 3 only in 2.6.0.
+# Channel priority: strict (conda config --set channel_priority strict).
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  - python=3.12
+  - semibin=2.4.1
+  - pytorch=2.8.0=cuda*
+  - cuda-version=12.9
+  - pandas=2.3
+  - numpy=2.3

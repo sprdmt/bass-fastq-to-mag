@@ -1,0 +1,13 @@
+# agtools: fastg2gfa conversion of the MEGAHIT graph.
+# Pin: 0.1.2 = user's env 'agtools'. 1.x (2025-08..2026-08) refactors graph classes; its only
+# bug fix (duplicate links, 654ba27) is in the GFA reader, not fastg2gfa. NOTE 1.1.0 changed
+# --output from a folder to a file name, so the rule must follow the pinned version's CLI.
+# Image: quay.io/biocontainers/agtools:0.1.2--py313hdfd78af_0 (py313-only build).
+# Channel priority: strict (conda config --set channel_priority strict).
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  - python=3.13
+  - agtools=0.1.2

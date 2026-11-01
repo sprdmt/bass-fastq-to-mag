@@ -1,0 +1,27 @@
+# Profile for the Life Science Compute Cluster (LiSC), University of Vienna.
+# Usage (from the project directory, in a SLURM job or a login session):
+#   ml snakemake/9.24.0-foss-2025b          # tested; ships the SLURM executor plugin 2.6.1
+#   snakemake --snakefile <repo>/workflow/Snakefile --workflow-profile <repo>/profiles/lisc
+# Also set in the project's config/config.yaml:
+#   resources: {limits: {max_threads: 96, max_mem_mb: 2000000}}
+# GPUs: LiSC has the GRES "gpu" (no shards), so the default gpu.gres "gpu:1" applies. The
+# cluster's submit plugin chooses the partition; expect a 16 GB Tesla T4 (profiles/lisc/README.md).
+executor: slurm
+jobs: 50
+software-deployment-method: apptainer
+# --bind /lisc: project, scratch, databases and the job TMPDIR live under /lisc.
+# LiSC modules (e.g. snakemake) export PYTHONPATH; it must not leak into the containers.
+apptainer-args: "--nv --bind /lisc --env PYTHONPATH= --env PYTHONNOUSERSITE=1"
+# Share pulled images between projects (they take ~30 GB); without this line every
+# project keeps its own copy in .snakemake/singularity:
+# apptainer-prefix: "/lisc/data/scratch/<group>/<user>/apptainer_images"
+retries: 2
+latency-wait: 120
+rerun-incomplete: true
+keep-going: true
+printshellcmds: true
+default-resources:
+  slurm_account: oceanography
+  slurm_extra: "'--no-requeue'"
+  runtime: 60
+  mem_mb: 4000

@@ -1,0 +1,36 @@
+# Apptainer equivalent of containers/genomeface/Dockerfile (same base image, same pin file).
+# Build from the repository root, e.g. on LiSC:
+#   apptainer build --fakeroot bass-fastq-to-mag-genomeface_1.0.1.sif containers/genomeface/genomeface.def
+Bootstrap: docker
+From: ghcr.io/mamba-org/micromamba:2.9.0
+
+%labels
+    org.opencontainers.image.title bass-fastq-to-mag-genomeface
+    org.opencontainers.image.description GenomeFace 1.0.1 (markersgf, genomeface) with TensorFlow 2.9.1 GPU, CUDA 11.7, RAPIDS 22.12
+    org.opencontainers.image.version 1.0.1
+    org.opencontainers.image.source https://github.com/sprdmt/bass-fastq-to-mag
+    org.opencontainers.image.base.name ghcr.io/mamba-org/micromamba:2.9.0
+
+%files
+    workflow/envs/genomeface.yaml /opt/env/genomeface.yaml
+    workflow/envs/genomeface.linux-64.pin.txt /opt/env/genomeface.linux-64.pin.txt
+
+%environment
+    export PATH=/opt/conda/bin:$PATH
+    export MAMBA_ROOT_PREFIX=/opt/conda
+    export PYTHONNOUSERSITE=1
+    export CUDA_PATH=/opt/conda
+
+%post
+    set -e
+    export MAMBA_ROOT_PREFIX=/opt/conda
+    export PATH=/opt/conda/bin:$PATH
+    export CONDA_OVERRIDE_CUDA=11.7
+    micromamba install -y -n base -f /opt/env/genomeface.linux-64.pin.txt
+    micromamba clean --all --yes
+    chmod -R a+rX /opt/conda /opt/env
+
+%test
+    export PATH=/opt/conda/bin:$PATH
+    export CUDA_PATH=/opt/conda
+    markersgf --help > /dev/null && python -c "import tensorflow as tf; print(tf.__version__)"

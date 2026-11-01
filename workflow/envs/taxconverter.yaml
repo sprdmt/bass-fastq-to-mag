@@ -1,0 +1,18 @@
+# taxconverter: convert MMseqs2 taxonomy to the GTDB-style lineage TaxVamb expects.
+# Pin: taxconverter 1.1.0 (only release, PyPI only) = user's env 'taxconv'. Its wheel pins
+# python<3.12, pandas==2.0.0, numpy==1.26.4, loguru==0.7.2; these come from conda-forge and the
+# wheel is installed without extra resolution.
+# Image: included in ghcr.io/sprdmt/bass-fastq-to-mag-vamb-gpu:5.0.4 (second env on PATH).
+# Channel priority: strict (conda config --set channel_priority strict).
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  - python=3.11
+  - pandas=2.0.0
+  - numpy=1.26.4
+  - loguru=0.7.2
+  - pip
+  - pip:
+      - taxconverter==1.1.0

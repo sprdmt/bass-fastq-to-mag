@@ -1,0 +1,10 @@
+# trnascan: tRNAscan-SE 2.0 (-B bacteria / -A archaea) for the MIMAG tRNA count.
+# Pin: 2.0.12 (user's Bakta-1.11.4 / anvio-9 envs). 2.0.13 only fixes legacy-mode compilation with GCC 15.
+# Image: quay.io/biocontainers/trnascan-se:2.0.12--pl5321h7b50bb2_2
+# Channel priority: strict (conda config --set channel_priority strict).
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  - trnascan-se=2.0.12

@@ -1,0 +1,37 @@
+# genomeface (GPU): markersgf + genomeface binning.
+# Mirrors the user's env 'genomeface' (mamba install genomeface cuda-version=11.7 -c nvidia -c rapidsai
+# -c conda-forge -c bioconda -c <NERSC channel>): genomeface 1.0.1 (only release), python 3.9,
+# TensorFlow 2.9.1 (cuda112 build), cudatoolkit 11.7 (nvidia), cuDNN 8.9.7, cuDF/RMM 22.12.
+# Solve with CONDA_OVERRIDE_CUDA=11.7 on machines without a GPU.
+# Image (custom): ghcr.io/sprdmt/bass-fastq-to-mag-genomeface:1.0.1
+# Exact reproduction of the user's env: genomeface.linux-64.pin.txt (explicit URLs, used by the image).
+# Requires FLEXIBLE channel priority (the user's original mamba install): under strict priority the nvidia channel
+# shadows conda-forge cuda-version/cudnn/nccl even for channel-qualified specs. Snakemake uses the pin file first.
+# pyrodigal/pyhmmer DIFFER from the user's env (3.6.3.post1 / 0.11.1): markersgf calls pyrodigal.OrfFinder
+# (renamed GeneFinder in pyrodigal 3.0; AttributeError verified on LiSC 2026-10-31) and uses the bytes-name
+# pyhmmer API (TopHits.query_name). Pinned to the last pyrodigal 2.x and the last pyhmmer 0.10.x.
+# Verified on LiSC 2026-10-31 with these pins: markersgf on a 213-contig MAG -> 22 marker hits (20 COGs);
+# `genomeface -h` under `apptainer exec --nv` lists the GPU for CuPy and TensorFlow (Tesla T4).
+# Channel priority: flexible (see above).
+channels:
+  - nvidia
+  - rapidsai
+  - conda-forge
+  - bioconda
+  - https://portal.nersc.gov/project/m1982/genomeface_repo
+  - nodefaults
+dependencies:
+  - python=3.9
+  - genomeface=1.0.1
+  - conda-forge::cuda-version=11.7
+  - nvidia::cudatoolkit=11.7
+  - conda-forge::tensorflow=2.9.1
+  - keras=2.9.0
+  - conda-forge::cudnn=8.9.7
+  - rapidsai::cudf=22.12
+  - rapidsai::rmm=22.12
+  - cupy=11.4
+  - numpy=1.23.5
+  - biopython
+  - pyrodigal=2.3.0
+  - pyhmmer=0.10.15

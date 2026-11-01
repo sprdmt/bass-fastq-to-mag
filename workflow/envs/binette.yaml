@@ -1,0 +1,16 @@
+# binette: consensus bin refinement (runs CheckM2 internally; needs the CheckM2 DIAMOND DB).
+# Pin: 1.2.1. User's env 'binette' had 1.1.2; LiSC central env Binette-1.2.1 exists. Documented fixes:
+# 1.2.0 no longer crashes on empty DIAMOND results (#72/#76); 1.2.1 fixes a severe slowdown in contig
+# filtering (#89/#90). NOTE 1.2.0 switched to a Typer CLI and changed the final TSV columns.
+# Image: quay.io/biocontainers/binette:1.2.1--pyh106432d_1 (same build as Binette-1.2.1; CPU TensorFlow).
+# CheckM2 build pinned as in checkm2.yaml (TF 2.17), as in LiSC Binette-1.2.1.
+# No explicit python pin: build _1 declares python >3.12 and TF 2.17 has no py313 build, so python resolves to 3.12.x
+# (libmamba rejects 'python=3.12' together with 'python >3.12' as an unsupported request).
+# Channel priority: strict (conda config --set channel_priority strict).
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  - binette=1.2.1
+  - checkm2=1.1.0=pyh7e72e81_1

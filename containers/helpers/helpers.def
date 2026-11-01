@@ -1,0 +1,33 @@
+# Apptainer equivalent of containers/helpers/Dockerfile (same base image, same pin file).
+# Build from the repository root, e.g. on LiSC:
+#   apptainer build --fakeroot bass-fastq-to-mag-helpers_1.0.0.sif containers/helpers/helpers.def
+Bootstrap: docker
+From: ghcr.io/mamba-org/micromamba:2.9.0
+
+%labels
+    org.opencontainers.image.title bass-fastq-to-mag-helpers
+    org.opencontainers.image.description Python 3.12 with pandas, biopython, pyyaml and openpyxl for workflow/scripts
+    org.opencontainers.image.version 1.0.0
+    org.opencontainers.image.source https://github.com/sprdmt/bass-fastq-to-mag
+    org.opencontainers.image.base.name ghcr.io/mamba-org/micromamba:2.9.0
+
+%files
+    workflow/envs/helpers.yaml /opt/env/helpers.yaml
+    workflow/envs/helpers.linux-64.pin.txt /opt/env/helpers.linux-64.pin.txt
+
+%environment
+    export PATH=/opt/conda/bin:$PATH
+    export MAMBA_ROOT_PREFIX=/opt/conda
+    export PYTHONNOUSERSITE=1
+
+%post
+    set -e
+    export MAMBA_ROOT_PREFIX=/opt/conda
+    export PATH=/opt/conda/bin:$PATH
+    micromamba install -y -n base -f /opt/env/helpers.linux-64.pin.txt
+    micromamba clean --all --yes
+    chmod -R a+rX /opt/conda /opt/env
+
+%test
+    export PATH=/opt/conda/bin:$PATH
+    python -c "import pandas, Bio, yaml, openpyxl; print(pandas.__version__, Bio.__version__)"

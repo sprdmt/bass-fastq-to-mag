@@ -1,0 +1,4 @@
+sample	fq1	fq2	assembly_group	run_accession	sample_accession
+S1	data/S1_R1.fastq.gz	data/S1_R2.fastq.gz	north		
+S2	data/S2_R1.fastq.gz	data/S2_R2.fastq.gz	north		
+S3	data/S3_R1.fastq.gz	data/S3_R2.fastq.gz	baltic		

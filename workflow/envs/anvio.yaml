@@ -1,0 +1,22 @@
+# anvio: anvi'o 9 contigs/profile databases, HMMs, SCG taxonomy, collections, manual refinement.
+# Pin: anvi'o 9 (v9 'eunice', 2026-01-19) = LiSC central env anvio-9. Bioconda ships it as anvio-minimal=9
+# (python 3.10, pandas 1.4.4); HMMER and DIAMOND are added for anvi-run-hmms / anvi-run-scg-taxonomy,
+# versions as in the LiSC anvio-9 env.
+# No official v9 image exists (Docker Hub meren/anvio tags stop at 8 + latest) and the Bioconda image lacks
+# hmmsearch/diamond/prodigal/samtools, so a custom image is built from this file (SCG taxonomy DMNDs set up at build).
+# Image (custom): ghcr.io/sprdmt/bass-fastq-to-mag-anvio:9
+# nodejs is required by anvi'o 9 for the interactive interface (anvi-interactive/anvi-refine; self-test stopped with
+# 'Config Error: Node.js is not installed' without it).
+# Channel priority: strict (conda config --set channel_priority strict).
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  - python=3.10
+  - anvio-minimal=9
+  - hmmer=3.4
+  - diamond=2.1.12
+  - prodigal=2.6.3
+  - samtools=1.21
+  - nodejs=22

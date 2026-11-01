@@ -1,15 +1,16 @@
+# Snakemake state and outputs
 .snakemake/
+results/
 logs/
-tmp/
-fastq/
-assembly/
-mapping/
-genes/
-binning/
-anvio/
+benchmarks/
+.test/results/
+.test/logs/
+.test/benchmarks/
+.test/.snakemake/
+# local data and caches
+*.sif
 __pycache__/
 *.pyc
+.pytest_cache/
 .DS_Store
-Thumbs.db
 *.swp
-*.swo

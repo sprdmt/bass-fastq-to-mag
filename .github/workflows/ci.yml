@@ -1,0 +1,54 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: mamba-org/setup-micromamba@v2
+        with:
+          environment-name: ci
+          create-args: >-
+            python=3.12
+            snakemake>=8.20
+            snakefmt
+            pytest
+            pandas
+            biopython
+            python-igraph
+            tqdm
+          condarc: |
+            channels: [conda-forge, bioconda]
+            channel_priority: strict
+
+      - name: Formatting (snakefmt)
+        run: snakefmt --check workflow/
+
+      - name: Lint
+        run: snakemake --directory .test --lint
+
+      - name: Dry runs of all targets
+        run: |
+          for target in all qc assembly bins anvio mags download_databases ena_prepare ena_validate ena_submit; do
+            echo "== $target"
+            snakemake "$target" --directory .test --dry-run --quiet
+          done
+
+      - name: Dry runs of configuration variants
+        run: |
+          for variant in .test/config/variants/*.yaml; do
+            echo "== $variant"
+            snakemake --directory .test --dry-run --quiet --configfile "$variant"
+          done
+
+      - name: Unit tests (helper scripts, ENA scripts, GraphBin2 against the reference)
+        run: pytest -q tests/

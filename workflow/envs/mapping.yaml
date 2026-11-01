@@ -1,0 +1,19 @@
+# mapping: bowtie2 piped into samtools (index, align, sort, index, idxstats).
+# Pin: exactly the nf-core/modules bowtie2/align environment of 2025-03-27 (commit 8357bae9e0),
+# used by nf-core until 2026-10-20: bowtie2 2.5.4 (= user's validated version), samtools/htslib 1.21
+# (LiSC SAMtools/1.21 module, user's anvio-9 env), pigz 2.8. bowtie2 2.5.5 only adds -d/AVX dispatch.
+# samtools security advisories fixed in 1.21.1-1.21.3 (mpileup ref cache, aux tag types, cram-size)
+# are not reachable from view/sort/index/idxstats on workflow-generated BAMs; patch builds are not in Bioconda.
+# Image: docker://community.wave.seqera.io/library/bowtie2_htslib_samtools_pigz:edeb13799090a2a6
+# python pinned to 3.13 = the python in the image (checked on LiSC).
+# Channel priority: strict (conda config --set channel_priority strict).
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  - python=3.13
+  - bowtie2=2.5.4
+  - htslib=1.21
+  - samtools=1.21
+  - pigz=2.8
